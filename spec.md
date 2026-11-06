@@ -212,3 +212,7 @@ This priority order does not remove any feature from the stated product scope. P
 - Hydration and break reminders are optional, configurable, and dismissible or snoozable.
 - Class entries may recur on selected weekdays. Importing from learning-management systems or external calendars is outside this initial scope.
 - The feature does not include collaboration, sharing, medical advice, or automatic wellness tracking.
+
+
+## Specification Document Link
+https://github.com/aromerosud/cozy-corner/blob/main/spec.md
