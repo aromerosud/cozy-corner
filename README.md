@@ -13,6 +13,10 @@
 
 Cozy Corner is a collaborative team project developed as part of the WDD430 Web Full-Stack Development course. This project focuses on building a full-stack web application using modern web technologies, including Next.js, React, TypeScript, and Tailwind CSS.
 
+### Project Board
+
+Work is tracked on the [Cozy Corner GitHub Project Board](https://github.com/users/asha-nephi/projects/1).
+
 ---
 
 ## Getting Started
