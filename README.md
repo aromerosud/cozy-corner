@@ -1,4 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cozy Corner
+
+## WDD430 – Web Full-Stack Development
+
+### Team Members
+
+- Jelina Alexandrine Concha
+- Nelson Georges
+- Nephi Ulimuke-Ebegim
+- Arturo Romero
+
+### Project Description
+
+Cozy Corner is a collaborative team project developed as part of the WDD430 Web Full-Stack Development course. This project focuses on building a full-stack web application using modern web technologies, including Next.js, React, TypeScript, and Tailwind CSS.
+
+---
 
 ## Getting Started
 
