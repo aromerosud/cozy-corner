@@ -8,7 +8,6 @@ Cozy Corner is a customizable student dashboard designed to help students organi
 
 The application aims to provide a personalized workspace where students can manage their classes, track assignments, organize notes, and monitor their study routines in a comfortable and engaging environment.
 
-
 ### Team Members
 
 - Jelina Alexandrine Concha
@@ -29,10 +28,13 @@ The planned features for Cozy Corner include:
 
 ### Technology Stack
 
-- **Framework:** Next.js
+- **Framework:** Next.js (App Router)
 - **UI Library:** React
 - **Programming Language:** TypeScript
 - **Styling:** Tailwind CSS
+- **Database:** PostgreSQL (Neon)
+- **ORM:** Drizzle ORM
+- **Code Quality:** ESLint and Prettier
 
 ## Getting Started
 
@@ -49,6 +51,7 @@ git clone https://github.com/aromerosud/cozy-corner.git
 cd cozy-corner
 npm install
 ```
+
 ### Run the Development Server
 
 Start the local development server:
@@ -67,3 +70,30 @@ The application automatically updates as you make changes to the source files.
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## Database and Migrations
+
+Cozy Corner uses PostgreSQL (Neon) as its database and Drizzle ORM to manage database schemas and migrations.
+
+### Database Structure
+
+- `src/db/schema/`: Contains the Drizzle schemas for the application entities.
+- `src/db/index.ts`: Centralized database connection.
+- `drizzle/`: Contains generated SQL migration files.
+- `drizzle.config.ts`: Drizzle Kit configuration.
+
+### Available Database Commands
+
+| Command               | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| `npm run db:generate` | Generates SQL migrations from the database schemas. |
+| `npm run db:migrate`  | Applies pending migrations to the database.         |
+| `npm run db:studio`   | Opens Drizzle Studio to inspect the database.       |
+
+### Environment Configuration
+
+A `DATABASE_URL` environment variable is required to connect to the Neon PostgreSQL database.
+
+Each developer must configure this variable in their local environment. Never commit database credentials or secrets to the repository.
+
+For database changes, update the Drizzle schemas and generate migrations before applying them to the database.

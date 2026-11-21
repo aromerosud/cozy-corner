@@ -21,22 +21,24 @@ The application will use the following technologies:
 - **React:** User interface development.
 - **TypeScript:** Static typing and improved code reliability.
 - **Tailwind CSS:** Styling and responsive layouts.
+- **PostgreSQL (Neon):** Relational database for application data.
+- **Drizzle ORM:** Type-safe database access, schema definitions, and SQL migrations.
 - **ESLint and Prettier:** Code quality and formatting.
 
 ## 3. Main Application Modules
 
 The application will be organized around the following functional areas:
 
-| Module | Responsibility |
-|---|---|
-| Authentication | User registration and sign-in. |
-| Dashboard | Overview of academic activities and enabled widgets. |
-| Classes | Class schedules and class information management. |
-| Assignments | Assignment creation, tracking, and management. |
-| Notes | Class notes and independent quick notes. |
-| Settings | Dashboard preferences and personalization. |
-| Study Tracking | Study sessions and study streaks. |
-| Wellness | Hydration check-ins and break timer functionality. |
+| Module         | Responsibility                                       |
+| -------------- | ---------------------------------------------------- |
+| Authentication | User registration and sign-in.                       |
+| Dashboard      | Overview of academic activities and enabled widgets. |
+| Classes        | Class schedules and class information management.    |
+| Assignments    | Assignment creation, tracking, and management.       |
+| Notes          | Class notes and independent quick notes.             |
+| Settings       | Dashboard preferences and personalization.           |
+| Study Tracking | Study sessions and study streaks.                    |
+| Wellness       | Hydration check-ins and break timer functionality.   |
 
 ### Implementation Priorities
 
@@ -135,6 +137,21 @@ cozy-corner/
 │       └── services/                # Wellness-related operations
 │
 ├── lib/                             # Shared utilities and configurations
+│
+├── src/                             # Source code for shared infrastructure
+│   └── db/                          # Database connection and schemas
+│       ├── schema/                  # Drizzle database schemas
+│       │   ├── users.ts
+│       │   ├── classes.ts
+│       │   ├── assignments.ts
+│       │   ├── notes.ts
+│       │   ├── dashboard_preferences.ts
+│       │   └── index.ts
+│       └── index.ts                 # Database client and connection
+│
+├── drizzle/                         # Generated SQL migrations
+├── drizzle.config.ts                # Drizzle Kit configuration
+│
 │
 ├── public/                          # Static assets (images, icons, fonts)
 │
@@ -271,23 +288,39 @@ To maintain consistency across the team, the following guidelines are proposed:
 9. Avoid unnecessary dependencies and overengineering.
 10. Follow the project's Git branch and Pull Request workflow.
 
+
 ## 8. Data and Feature Integration
 
 Each feature should interact with its own data and services while following the common application requirements.
 
-The architecture should support the main entities defined in the project specification:
+The application uses PostgreSQL (Neon) as its relational database and Drizzle ORM for database schema definitions, type-safe database access, and SQL migration generation.
 
-- Student Account
+The initial database schema includes the following entities:
+
+- Student Account (User)
 - Class
 - Assignment
 - Note
 - Dashboard Preferences
-- Study Session and Streak
-- Wellness Activity
 
-User-specific information must remain private and associated with the correct student account.
+These entities establish the foundation for the core academic features and user-specific dashboard configuration.
 
-The detailed data model and relationships will be documented separately as part of the team's data modeling work.
+Future functionality may introduce additional entities, including:
+
+- Study Sessions and Streaks
+- Hydration Check-ins
+- Break Timer Sessions
+
+Database schemas are maintained in `src/db/schema/`, while generated SQL migrations are stored in `drizzle/`.
+
+The database connection is centralized in `src/db/index.ts` and uses the `DATABASE_URL` environment variable.
+
+Database changes should be managed through Drizzle migrations rather than manual schema modifications.
+
+User-specific information must remain private and associated with the correct student account. Database relationships and constraints should help preserve data integrity and prevent users from accessing records belonging to other accounts.
+
+The detailed entities, fields, relationships, and constraints are documented separately in `docs/data-model.md`.
+
 
 ## 9. Pending Team Decisions
 
@@ -328,15 +361,15 @@ features/
 
 ### File Naming
 
-| File Type | Convention | Example |
-|---|---|---|
-| React components | PascalCase | `ClassCard.tsx` |
-| Custom hooks | camelCase with `use` prefix | `useClasses.ts` |
-| Functions and variables | camelCase | `getAssignments()` |
-| Types and interfaces | PascalCase | `Class`, `Assignment` |
-| Service files | kebab-case | `class-service.ts` |
-| Next.js page files | Next.js convention | `page.tsx` |
-| Layout files | Next.js convention | `layout.tsx` |
+| File Type               | Convention                  | Example               |
+| ----------------------- | --------------------------- | --------------------- |
+| React components        | PascalCase                  | `ClassCard.tsx`       |
+| Custom hooks            | camelCase with `use` prefix | `useClasses.ts`       |
+| Functions and variables | camelCase                   | `getAssignments()`    |
+| Types and interfaces    | PascalCase                  | `Class`, `Assignment` |
+| Service files           | kebab-case                  | `class-service.ts`    |
+| Next.js page files      | Next.js convention          | `page.tsx`            |
+| Layout files            | Next.js convention          | `layout.tsx`          |
 
 ### Component Organization
 
@@ -370,12 +403,12 @@ Each team member should create a separate branch for each task or feature.
 
 Use the following naming conventions:
 
-| Branch Type | Naming Convention | Example |
-|---|---|---|
-| Feature | `feature/description` | `feature/classes-management` |
-| Bug Fix | `fix/description` | `fix/assignment-validation` |
-| Documentation | `docs/description` | `docs/update-architecture` |
-| Refactoring | `refactor/description` | `refactor/shared-components` |
+| Branch Type   | Naming Convention      | Example                      |
+| ------------- | ---------------------- | ---------------------------- |
+| Feature       | `feature/description`  | `feature/classes-management` |
+| Bug Fix       | `fix/description`      | `fix/assignment-validation`  |
+| Documentation | `docs/description`     | `docs/update-architecture`   |
+| Refactoring   | `refactor/description` | `refactor/shared-components` |
 
 ### Development Workflow
 
@@ -424,12 +457,12 @@ To coordinate development and avoid conflicts, the team will follow these collab
 
 The following responsibilities define the initial areas of coordination for each team member:
 
-| Team Member | Primary Responsibility |
-|---|---|
-| Arturo Romero | Component architecture, project structure, development conventions, and Pull Request coordination. |
-| Nelson Georges | Data models, TypeScript types, and academic feature integration. |
-| Jelina Alexandrine Concha | UI design, visual components, styling guidelines, and user experience consistency. |
-| Nephi Ulimuke-Ebegim | GitHub issues, project board organization, and project documentation. |
+| Team Member               | Primary Responsibility                                                                             |
+| ------------------------- | -------------------------------------------------------------------------------------------------- |
+| Arturo Romero             | Component architecture, project structure, development conventions, and Pull Request coordination. |
+| Nelson Georges            | Data models, TypeScript types, and academic feature integration.                                   |
+| Jelina Alexandrine Concha | UI design, visual components, styling guidelines, and user experience consistency.                 |
+| Nephi Ulimuke-Ebegim      | GitHub issues, project board organization, and project documentation.                              |
 
 These responsibilities establish areas of coordination and do not prevent team members from contributing to other parts of the application.
 
