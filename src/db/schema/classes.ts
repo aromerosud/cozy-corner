@@ -35,6 +35,14 @@ export const classes = pgTable(
   },
   (table) => [
     check("classes_time_check", sql`${table.endTime} > ${table.startTime}`),
+    check(
+      "classes_meeting_days_check",
+      sql`array_length(${table.meetingDays}, 1) > 0
+        AND ${table.meetingDays} <@ ARRAY[
+          'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+          'Friday', 'Saturday', 'Sunday'
+        ]::text[]`,
+    ),
     unique("classes_id_user_id_unique").on(table.id, table.userId),
   ],
 );
