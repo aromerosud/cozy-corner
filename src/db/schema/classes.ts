@@ -1,0 +1,48 @@
+import { sql } from "drizzle-orm";
+
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  time,
+  check,
+  unique,
+} from "drizzle-orm/pg-core";
+
+import { users } from "./users";
+
+export const classes = pgTable(
+  "classes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+
+    name: varchar("name", { length: 150 }).notNull(),
+
+    meetingDays: text("meeting_days").array().notNull(),
+
+    startTime: time("start_time").notNull(),
+
+    endTime: time("end_time").notNull(),
+
+    location: text("location"),
+
+    color: varchar("color", { length: 30 }),
+  },
+  (table) => [
+    check("classes_time_check", sql`${table.endTime} > ${table.startTime}`),
+    check(
+      "classes_meeting_days_check",
+      sql`array_length(${table.meetingDays}, 1) > 0
+        AND ${table.meetingDays} <@ ARRAY[
+          'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+          'Friday', 'Saturday', 'Sunday'
+        ]::text[]`,
+    ),
+    unique("classes_id_user_id_unique").on(table.id, table.userId),
+  ],
+);
