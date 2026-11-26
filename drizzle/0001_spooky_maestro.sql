@@ -1,0 +1,2 @@
+ALTER TABLE "dashboard_preferences" ADD CONSTRAINT "hydration_interval_positive" CHECK ("dashboard_preferences"."hydration_interval" IS NULL OR "dashboard_preferences"."hydration_interval" > 0);--> statement-breakpoint
+ALTER TABLE "dashboard_preferences" ADD CONSTRAINT "break_duration_positive" CHECK ("dashboard_preferences"."break_duration" > 0);
