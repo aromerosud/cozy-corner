@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { authConfig } from "./auth.config";
 import { eq } from "drizzle-orm";
 
 import { getDb } from "@/src/db";
@@ -7,6 +8,7 @@ import { users } from "@/src/db/schema";
 import { verifyPassword } from "@/src/lib/password";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   basePath: "/api/v1/auth",
   session: {
     strategy: "jwt",
@@ -60,7 +62,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+
   callbacks: {
+    ...authConfig.callbacks,
+
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
@@ -68,6 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return token;
     },
+
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
