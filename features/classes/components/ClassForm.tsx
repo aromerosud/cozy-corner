@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+type ClassApiError = {
+  error?: string;
+  message?: string;
+  details?: Record<string, string[]>;
+};
+import { useRouter } from "next/navigation";
 
 const weekdays = [
   "Monday",
@@ -13,9 +19,10 @@ const weekdays = [
 ];
 
 export default function ClassForm() {
-    const [error, setError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
   
 
 async function handleSubmit(
@@ -69,17 +76,33 @@ async function handleSubmit(
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        setError("Please sign in to add a class.");
-        return;
-      }
+  if (response.status === 401) {
+    setError("Please sign in to add a class.");
+    return;
+  }
 
-      setError("Unable to create class. Please try again.");
-      return;
-    }
+  const data: ClassApiError = await response
+    .json()
+    .catch(() => ({}));
+
+  const validationErrors = Object.values(
+    data.details ?? {}
+  ).flat();
+
+  setError(
+    validationErrors.length > 0
+      ? validationErrors.join(" ")
+      : data.error ||
+        data.message ||
+        "Unable to create class. Please try again."
+  );
+
+  return;
+}
 
     setSuccess("Class created successfully!");
     form.reset();
+    router.refresh();
   } catch {
     setError("Unable to connect to the server.");
   } finally {
@@ -106,6 +129,7 @@ async function handleSubmit(
             placeholder="e.g. Web Development"
             className="w-full rounded-lg border p-3"
           />
+          </div>
 
           <fieldset>
             <legend className="mb-2 font-medium">Meeting Days</legend>
@@ -157,8 +181,6 @@ async function handleSubmit(
               />
             </div>
           </div>
-        </div>
-
         <div>
           <label htmlFor="class-location" className="mb-2 block font-medium">
             Location (Optional)
@@ -189,11 +211,12 @@ async function handleSubmit(
         {error && (
           <p role="alert" className="text-sm font-medium text-red-600">
             {error}
-            {success && (
-              <p role="status" className="text-sm font-medium text-green-600">
-                {success}
-              </p>
-            )}
+          </p>
+        )}
+
+        {success && (
+          <p role="status" className="text-sm font-medium text-green-600">
+            {success}
           </p>
         )}
 

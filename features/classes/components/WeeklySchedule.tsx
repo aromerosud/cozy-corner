@@ -22,6 +22,29 @@ const weekdays = [
   "Sunday",
 ];
 
+function getConflictingClassIds(
+  dayClasses: ClassScheduleItem[]
+): Set<string> {
+  const conflictingIds = new Set<string>();
+
+  for (let i = 0; i < dayClasses.length; i++) {
+    for (let j = i + 1; j < dayClasses.length; j++) {
+      const first = dayClasses[i];
+      const second = dayClasses[j];
+
+      if (
+        first.startTime < second.endTime &&
+        second.startTime < first.endTime
+      ) {
+        conflictingIds.add(first.id);
+        conflictingIds.add(second.id);
+      }
+    }
+  }
+
+  return conflictingIds;
+}
+
 export default function WeeklySchedule({ classes }: WeeklyScheduleProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -30,22 +53,7 @@ export default function WeeklySchedule({ classes }: WeeklyScheduleProps) {
           .filter((classItem) => classItem.meetingDays.includes(day))
           .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-        const conflictingIds = new Set<string>();
-
-        for (let i = 0; i < dayClasses.length; i++) {
-          for (let j = i + 1; j < dayClasses.length; j++) {
-            const first = dayClasses[i];
-            const second = dayClasses[j];
-
-            if (
-              first.startTime < second.endTime &&
-              second.startTime < first.endTime
-            ) {
-              conflictingIds.add(first.id);
-              conflictingIds.add(second.id);
-            }
-          }
-        }
+        const conflictingIds = getConflictingClassIds(dayClasses);
 
         return (
           <section key={day} className="min-h-40 rounded-xl border p-4">
