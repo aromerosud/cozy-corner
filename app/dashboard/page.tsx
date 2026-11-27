@@ -1,37 +1,65 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { logout } from "@/src/lib/actions/auth";
+import React from "react";
+import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
+import type { DashboardOverviewData } from "@/types/dashboard";
 
-export const instant = false;
+const sampleDashboardData: DashboardOverviewData = {
+    studentName: "Jelina",
+    programSummary: "WDD430 • Web Full-Stack Development",
+    streakDays: 4,
+    schedule: [
+        {
+            id: "sched-1",
+            title: "Full-Stack Architecture & Next.js",
+            courseCode: "WDD430",
+            timeLabel: "5:00 PM – 6:30 PM",
+            locationOrMode: "Online Lab",
+            isNext: true,
+        },
+    ],
+    assignments: [
+        {
+            id: "assign-1",
+            title: "Week 04 Team Project & Feature PR",
+            courseCode: "WDD430",
+            dueDateLabel: "Nov 28, 2026",
+            status: "pending",
+        },
+    ],
+    notes: [
+        {
+            id: "note-1",
+            title: "App Router & Server Components",
+            excerpt: "Keep data fetching clean and use client state only for interactive UI.",
+            category: "lecture",
+            updatedAtLabel: "Today",
+        },
+        {
+            id: "note-2",
+            title: "Tailwind Palette & Spacing Checklist",
+            excerpt: "Warm cream canvas (#FDFBF7), terracotta accents (#A36B49), sage status (#7B8B6F).",
+            category: "study",
+            updatedAtLabel: "Yesterday",
+        },
+    ],
+    wellnessPrompts: [
+        {
+            id: "well-1",
+            label: "Hydration",
+            detail: "Drink a glass of water in 30 minutes",
+            kind: "hydration",
+            enabled: true,
+        },
+        {
+            id: "well-2",
+            label: "Break",
+            detail: "Short stretch after your next study block",
+            kind: "break",
+            enabled: true,
+        },
+    ],
+};
 
-export default async function DashboardPage() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  return (
-    <main className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="text-center">
-        <h1 className="font-serif text-3xl font-bold">
-          Welcome to Cozy Corner!
-        </h1>
-
-        <p className="mt-3 text-muted">Your cozy workspace is ready.</p>
-
-        <p className="mt-4 text-sm text-muted">
-          Signed in as {session.user.email}
-        </p>
-        <form action={logout} className="mt-6">
-          <button
-            type="submit"
-            className="rounded-xl bg-brand px-5 py-3 font-semibold text-white transition-colors hover:bg-brand-hover"
-          >
-            Sign Out
-          </button>
-        </form>
-      </div>
-    </main>
-  );
+export default function DashboardPage() {
+    return <DashboardOverview data={sampleDashboardData} />;
 }
+
