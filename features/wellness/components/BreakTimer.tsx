@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useId, useReducer } from "react";
+import { useEffect, useId, useReducer, useState } from "react";
 import {
+  DEFAULT_BREAK_MINUTES,
   MAX_BREAK_MINUTES,
   MIN_BREAK_MINUTES,
   breakTimerReducer,
+  clampMinutes,
   createInitialState,
   formatRemaining,
 } from "@/features/wellness/services/break-timer-reducer";
@@ -30,8 +32,48 @@ export default function BreakTimer() {
   const [state, dispatch] = useReducer(breakTimerReducer, undefined, () =>
     createInitialState(),
   );
+  // The custom field keeps its own text while the student is typing, so
+  // clearing it or typing a partial number does not reset the length. The
+  // value is validated and applied when it is a valid number, and corrected
+  // when the student leaves the field.
+  const [customInput, setCustomInput] = useState(() =>
+    String(DEFAULT_BREAK_MINUTES),
+  );
   const durationInputId = useId();
   const { status, durationMinutes, remainingMs } = state;
+
+  function handleCustomChange(value: string) {
+    setCustomInput(value);
+
+    const minutes = Number(value);
+    const isValid =
+      value.trim() !== "" &&
+      Number.isInteger(minutes) &&
+      minutes >= MIN_BREAK_MINUTES &&
+      minutes <= MAX_BREAK_MINUTES;
+
+    if (isValid) {
+      dispatch({ type: "set-duration", minutes });
+    }
+  }
+
+  function handleCustomBlur() {
+    // An empty field goes back to the last valid length.
+    if (customInput.trim() === "") {
+      setCustomInput(String(durationMinutes));
+      return;
+    }
+
+    const minutes = clampMinutes(Number(customInput));
+
+    dispatch({ type: "set-duration", minutes });
+    setCustomInput(String(minutes));
+  }
+
+  function handlePresetClick(minutes: number) {
+    dispatch({ type: "set-duration", minutes });
+    setCustomInput(String(minutes));
+  }
 
   // Recompute from the end timestamp on every tick so the display stays
   // accurate even if the tab is throttled in the background.
@@ -106,7 +148,7 @@ export default function BreakTimer() {
               key={minutes}
               type="button"
               aria-pressed={durationMinutes === minutes}
-              onClick={() => dispatch({ type: "set-duration", minutes })}
+              onClick={() => handlePresetClick(minutes)}
               className={`rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A36B49] ${
                 durationMinutes === minutes
                   ? "border-[#A36B49] bg-[#A36B49] text-white"
@@ -129,13 +171,9 @@ export default function BreakTimer() {
             inputMode="numeric"
             min={MIN_BREAK_MINUTES}
             max={MAX_BREAK_MINUTES}
-            value={durationMinutes}
-            onChange={(event) =>
-              dispatch({
-                type: "set-duration",
-                minutes: event.target.valueAsNumber,
-              })
-            }
+            value={customInput}
+            onChange={(event) => handleCustomChange(event.target.value)}
+            onBlur={handleCustomBlur}
             className="w-20 rounded-xl border border-[#E8E2D5] bg-white px-3 py-1.5 text-sm text-[#2C2420] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A36B49]"
           />
         </div>
